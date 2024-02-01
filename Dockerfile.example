@@ -1,0 +1,27 @@
+FROM quay.io/pypa/manylinux_2_28_x86_64
+RUN yum install -y java-17-openjdk-devel yum-utils &&\
+    yum-builddep -y python3 &&\
+    /opt/python/cp311-cp311/bin/pip install poetry
+
+ADD usvm /home/usvm
+ADD UTBotJava /home/UTBotJava
+ADD utbot_dist /home/utbot_dist
+
+ENV GITHUB_ACTOR=<github user>
+ENV GITHUB_TOKEN=<github access token>
+
+
+WORKDIR /home/usvm/usvm-python
+CMD ./buildDistWithoutPip.sh &&\
+    mv build/distributions/usvm-python.zip /home/utbot_dist/utbot_dist &&\
+    cd /home/utbot_dist/utbot_dist &&\
+    unzip usvm-python.zip &&\
+    rm usvm-python.zip &&\
+    cd /home/UTBotJava &&\
+    chmod +x ./gradlew &&\
+    ./gradlew utbot-cli-python:jar &&\
+    cp /home/UTBotJava/utbot-cli-python/build/libs/utbot-cli-python-*.jar /home/utbot_dist/utbot_dist/utbot-cli-python.jar &&\
+    cd /home/utbot_dist &&\
+    /opt/python/cp311-cp311/bin/python3 -m poetry build &&\
+    auditwheel show dist/utbot_dist-0.1.0-py3-none-any.whl &&\
+    auditwheel repair dist/utbot_dist-0.1.0-py3-none-any.whl --plat manylinux_2_31_x86_64
