@@ -1,0 +1,8 @@
+[submodule "UTBotJava"]
+	path = UTBotJava
+	url = https://github.com/UnitTestBot/UTBotJava.git
+    branch = tochilinak/usvm-python
+[submodule "usvm"]
+	path = usvm
+	url = https://github.com/UnitTestBot/usvm.git
+    branch = tochilinak/python
